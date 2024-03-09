@@ -54,3 +54,6 @@ html {
   color: #00ff00;
 }
 
+audio {
+  display: none; /* Hide the entire audio element */
+}

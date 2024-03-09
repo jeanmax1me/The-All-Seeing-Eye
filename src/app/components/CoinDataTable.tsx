@@ -1,9 +1,5 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
-import dynamic from 'next/dynamic';
-
-const alertHigherSound = dynamic(() => import("./../audio/alertHigher.mp3"));
-const alertLowerSound = dynamic(() => import("./../audio/alertLower.mp3"));
 
 const TopCoinsPriceTracker: React.FC = () => {
   const [prices, setPrices] = useState<{ [key: string]: number }>({});
@@ -69,19 +65,32 @@ const TopCoinsPriceTracker: React.FC = () => {
     }));
   };
 
-  const handleAlertSubmit = (symbol: string) => {
+  function handleAlertSubmit(symbol: string) {
     const { condition, value } = alerts[symbol];
-    // Implement your alert logic here
-    console.log(
-      `Alert for ${symbol}: Condition - ${condition}, Value - ${value}`
-    );
-    // Play different sounds based on the condition
-    const audio = new Audio(
-      condition === "higher" ? alertHigherSound : alertLowerSound
-    );
-    audio.play();
-    setAlertSet(true); // Set alert flag to true when an alert is submitted
-  };
+  
+    // Set the alert flag to true
+    setAlertSet(true);
+  
+    // Only log and play sound if the condition is already met
+    if (value !== null && (
+      (condition === "higher" && prices[symbol] > parseFloat(value)) ||
+      (condition === "lower" && prices[symbol] < parseFloat(value))
+    )) {
+      console.log(
+        `Alert for ${symbol}: Condition - ${condition}, Value - ${value}`
+      );
+  
+      const soundToPlay = condition === "higher" ? "alertHigherSound" : "alertLowerSound";
+      const audioElement = document.getElementById(soundToPlay) as HTMLAudioElement;
+  
+      if (audioElement) {
+        audioElement.play();
+      } else {
+        console.warn("Audio element not found.");
+      }
+    }
+  }
+  
 
   const hasActiveAlerts = () => {
     return Object.keys(alerts).length > 0;
@@ -143,6 +152,12 @@ const TopCoinsPriceTracker: React.FC = () => {
 
   return (
     <div className="max-w-screen-md mx-auto">
+      <audio
+        id="alertHigherSound"
+        controls
+        src="/audio/alertHigher.mp3"
+      ></audio>
+      <audio id="alertLowerSound" controls src="/audio/alertLower.mp3"></audio>
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-slate-800">
