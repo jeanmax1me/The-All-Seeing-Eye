@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
+  font-family: Poppins, "MS Serif", New York, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  height: 100%;
+  line-height: 150%;
+  text-rendering: optimizeLegibility;
+}
+
+html {
+  background-color: #0d0d0d;
+  color: #eee;
+  scroll-behavior: smooth;
+}
+
+.gradient-background {
+  background-image: url('./../../public/ellipse.svg');
+  background-size: cover; /* or contain, or specific dimensions */
+  background-repeat: repeat;
+  background-position: center center; /* or any other position */
+}
+
+@font-face {
+  font-family: 'coolvetica';
+  src: url('./fonts/coolvetica.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.headertext {
+  font-family: 'coolvetica';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 28px; 
+  line-height: 1.5; 
+  color: #eee;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4); 
+  transition: all 0.2 ease;
+  cursor: pointer;
+}
+
+.headertext:hover {
+  color: #00ff00;
+}
+
