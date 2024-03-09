@@ -41,7 +41,7 @@ export default function Home() {
       </div>
       <CoinDataTable />
       <div className="mb-32">
-     <p> &ldquo;When you genuinely accept the risks, you will be at peace with any outcome. &rdquo; - Mark Douglas </p>
+     <p> &ldquo;When you genuinely accept the risks, you will be at peace with any outcome. &rdquo;  Mark Douglas </p>
       </div>
     </main>
   );
