@@ -1,37 +1,44 @@
-'use client';
+"use client";
 import { useEffect, useState, useCallback } from "react";
+import dynamic from 'next/dynamic';
+
+const alertHigherSound = dynamic(() => import("./../audio/alertHigher.mp3"));
+const alertLowerSound = dynamic(() => import("./../audio/alertLower.mp3"));
 
 const TopCoinsPriceTracker: React.FC = () => {
-    const [prices, setPrices] = useState<{ [key: string]: number }>({});
-    const [ws, setWs] = useState<WebSocket | null>(null);
-    const [selectedSymbol, setSelectedSymbol] = useState<string>("");
-    const [alertCondition, setAlertCondition] = useState<string>("");
-    const [alertValue, setAlertValue] = useState<number | null>(null);
-    const [alerts, setAlerts] = useState<{
-      [key: string]: { condition: string; value: string | null };
-    }>({});
-    const [alertSet, setAlertSet] = useState<boolean>(false); // Track whether an alert has been set
-  
-    const checkAlerts = useCallback(() => {
-        // Your alert checking logic here
-        Object.entries(alerts).forEach(([symbol, alert]) => {
-          if (prices[symbol] != null && alert.value != null) {
-            if (
-              (alert.condition === "higher" && prices[symbol] > parseFloat(alert.value)) ||
-              (alert.condition === "lower" && prices[symbol] < parseFloat(alert.value))
-            ) {
-              console.log(`Alert for ${symbol}: Condition - ${alert.condition}, Value - ${alert.value}`);
-            }
-          }
-        });
-      }, [alerts, prices]);
+  const [prices, setPrices] = useState<{ [key: string]: number }>({});
+  const [ws, setWs] = useState<WebSocket | null>(null);
+  const [selectedSymbol, setSelectedSymbol] = useState<string>("");
+  const [alertCondition, setAlertCondition] = useState<string>("");
+  const [alertValue, setAlertValue] = useState<number | null>(null);
+  const [alerts, setAlerts] = useState<{
+    [key: string]: { condition: string; value: string | null };
+  }>({});
+  const [alertSet, setAlertSet] = useState<boolean>(false); // Track whether an alert has been set
 
-    useEffect(() => {
-        const intervalId = setInterval(checkAlerts, 3000);
-      
-        return () => clearInterval(intervalId);
-      }, [checkAlerts]);
+  const checkAlerts = useCallback(() => {
+    // Your alert checking logic here
+    Object.entries(alerts).forEach(([symbol, alert]) => {
+      if (prices[symbol] != null && alert.value != null) {
+        if (
+          (alert.condition === "higher" &&
+            prices[symbol] > parseFloat(alert.value)) ||
+          (alert.condition === "lower" &&
+            prices[symbol] < parseFloat(alert.value))
+        ) {
+          console.log(
+            `Alert for ${symbol}: Condition - ${alert.condition}, Value - ${alert.value}`
+          );
+        }
+      }
+    });
+  }, [alerts, prices]);
 
+  useEffect(() => {
+    const intervalId = setInterval(checkAlerts, 3000);
+
+    return () => clearInterval(intervalId);
+  }, [checkAlerts]);
 
   const handleAlertConditionChange = (
     symbol: string,
@@ -51,7 +58,7 @@ const TopCoinsPriceTracker: React.FC = () => {
     symbol: string,
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const value = event.target.value as string; // Assert as number
+    const value = event.target.value as string; // Assert as string for the moment
 
     setAlerts((prevAlerts) => ({
       ...prevAlerts,
@@ -68,6 +75,11 @@ const TopCoinsPriceTracker: React.FC = () => {
     console.log(
       `Alert for ${symbol}: Condition - ${condition}, Value - ${value}`
     );
+    // Play different sounds based on the condition
+    const audio = new Audio(
+      condition === "higher" ? alertHigherSound : alertLowerSound
+    );
+    audio.play();
     setAlertSet(true); // Set alert flag to true when an alert is submitted
   };
 
@@ -77,13 +89,7 @@ const TopCoinsPriceTracker: React.FC = () => {
 
   useEffect(() => {
     const wsEndpoint = "wss://stream.binance.com:9443";
-    const topCoins = [
-      "btcusdt",
-      "ethusdt",
-      "flokiusdt",
-      "wifusdt",
-      "ftmusdt",
-    ];
+    const topCoins = ["btcusdt", "ethusdt", "flokiusdt", "wifusdt", "ftmusdt"];
 
     const subscribeMessages = topCoins.map((coin) => ({
       method: "SUBSCRIBE",
