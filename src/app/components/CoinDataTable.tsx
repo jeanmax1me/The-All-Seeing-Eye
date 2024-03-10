@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
+import PriceAlertForm from "./PriceAlertsForm";
+import PriceTable from "./PriceTable";
 
 const TopCoinsPriceTracker: React.FC = () => {
   const [prices, setPrices] = useState<{ [key: string]: number }>({});
@@ -11,9 +13,12 @@ const TopCoinsPriceTracker: React.FC = () => {
     [key: string]: { condition: string; value: string | null };
   }>({});
   const [alertSet, setAlertSet] = useState<boolean>(false); // Track whether an alert has been set
+  const [intervalInitialized, setIntervalInitialized] = useState<boolean>(false);
+
 
   const checkAlerts = useCallback(() => {
-    // Your alert checking logic here
+    console.log("Checking alerts...");
+
     Object.entries(alerts).forEach(([symbol, alert]) => {
       if (prices[symbol] != null && alert.value != null) {
         if (
@@ -31,10 +36,19 @@ const TopCoinsPriceTracker: React.FC = () => {
   }, [alerts, prices]);
 
   useEffect(() => {
-    const intervalId = setInterval(checkAlerts, 3000);
+    if (!intervalInitialized) {
+      const intervalId = setInterval(checkAlerts, 3000);
+      console.log("Alert checking interval started.");
+      setIntervalInitialized(true);
 
-    return () => clearInterval(intervalId);
-  }, [checkAlerts]);
+      return () => {
+        clearInterval(intervalId);
+        console.log("Alert checking interval stopped.");
+      };
+    }
+  }, [checkAlerts, intervalInitialized]);
+
+
 
   const handleAlertConditionChange = (
     symbol: string,
@@ -65,32 +79,44 @@ const TopCoinsPriceTracker: React.FC = () => {
     }));
   };
 
-  function handleAlertSubmit(symbol: string) {
-    const { condition, value } = alerts[symbol];
+  const checkAndTriggerAlert = (symbol: string, condition: string, value: string | null) => {
+    console.log(`Checking alert for ${symbol}: Condition - ${condition}, Value - ${value}`);
   
-    // Set the alert flag to true
-    setAlertSet(true);
-  
-    // Only log and play sound if the condition is already met
     if (value !== null && (
       (condition === "higher" && prices[symbol] > parseFloat(value)) ||
       (condition === "lower" && prices[symbol] < parseFloat(value))
     )) {
-      console.log(
-        `Alert for ${symbol}: Condition - ${condition}, Value - ${value}`
-      );
-  
-      const soundToPlay = condition === "higher" ? "alertHigherSound" : "alertLowerSound";
-      const audioElement = document.getElementById(soundToPlay) as HTMLAudioElement;
-  
-      if (audioElement) {
-        audioElement.play();
-      } else {
-        console.warn("Audio element not found.");
-      }
+      console.log(`Alert triggered for ${symbol}: Condition - ${condition}, Value - ${value}`);
+      playAlertSound(condition);
+    } else {
+      console.log(`Alert not triggered for ${symbol}: Condition - ${condition}, Value - ${value}`);
     }
+  };
+  
+  
+  const playAlertSound = (condition: string) => {
+    const soundToPlay = condition === "higher" ? "alertHigherSound" : "alertLowerSound";
+    const audioElement = document.getElementById(soundToPlay) as HTMLAudioElement;
+  
+    if (audioElement) {
+      audioElement.play();
+    } else {
+      console.warn("Audio element not found.");
+    }
+  };
+  
+  function handleAlertSubmit(symbol: string) {
+    const { condition, value } = alerts[symbol];
+  
+    console.log(`Alert submitted for ${symbol}: Condition - ${condition}, Value - ${value}`);
+  
+    // Set the alert flag to true
+    setAlertSet(true);
+  
+    checkAndTriggerAlert(symbol, condition, value);
   }
   
+
 
   const hasActiveAlerts = () => {
     return Object.keys(alerts).length > 0;
@@ -98,7 +124,7 @@ const TopCoinsPriceTracker: React.FC = () => {
 
   useEffect(() => {
     const wsEndpoint = "wss://stream.binance.com:9443";
-    const topCoins = ["btcusdt", "ethusdt", "flokiusdt", "wifusdt", "ftmusdt"];
+    const topCoins = ["btcusdt", "ethusdt", "flokiusdt", "wifusdt", "galausdt"];
 
     const subscribeMessages = topCoins.map((coin) => ({
       method: "SUBSCRIBE",
@@ -130,7 +156,7 @@ const TopCoinsPriceTracker: React.FC = () => {
     newWs.onerror = (error) => {
       console.error("WebSocket error:", error);
       console.log("WebSocket readyState:", newWs.readyState);
-
+    
       if (error instanceof Event) {
         // If the error is an Event object, log its type, target, and any other relevant properties
         console.log("WebSocket error event:", {
@@ -138,13 +164,19 @@ const TopCoinsPriceTracker: React.FC = () => {
           target: error.target,
           timestamp: error.timeStamp,
         });
+    
+        // Display an error message to the user
+        alert("WebSocket connection error occurred. Please refresh the page to reconnect.");
       } else {
         console.log("WebSocket error:", {
           type: typeof error,
         });
+    
+        // Display an error message to the user
+        alert("WebSocket connection error occurred. Please refresh the page to reconnect.");
       }
     };
-
+    
     return () => {
       newWs.close();
     };
@@ -158,70 +190,20 @@ const TopCoinsPriceTracker: React.FC = () => {
         src="/audio/alertHigher.mp3"
       ></audio>
       <audio id="alertLowerSound" controls src="/audio/alertLower.mp3"></audio>
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="bg-slate-800">
-            <th className="py-2 px-4">Coin</th>
-            <th className="py-2 px-4">Price (USDT)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Object.entries(prices)
-            .filter(([_, price]) => !isNaN(price))
-            .map(([symbol, price]) => (
-              <tr key={symbol} className="border-b">
-                <td className="py-2 px-4 symbol">{symbol.split("USDT")[0]}</td>
-                <td className="py-2 px-4 price">{price}</td>
-                <td className="py-2 px-4">
-                  <select
-                    value={alerts[symbol]?.condition || ""}
-                    onChange={(event) =>
-                      handleAlertConditionChange(symbol, event)
-                    }
-                    className="border rounded p-1 mr-2 text-zinc-800"
-                  >
-                    <option value="">Select condition</option>
-                    <option value="higher">Price is higher than</option>
-                    <option value="lower">Price is lower than</option>
-                  </select>
-                  <input
-                    type="text"
-                    pattern="[0-9]*\.?[0-9]*"
-                    value={alerts[symbol]?.value || ""}
-                    onChange={(event) => handleAlertValueChange(symbol, event)}
-                    placeholder="Enter value"
-                    className="border rounded p-1 text-zinc-800"
-                  />
-
-                  <button
-                    onClick={() => handleAlertSubmit(symbol)}
-                    className="bg-blue-500 text-white py-1 px-3 ml-2 rounded"
-                  >
-                    Set Alert
-                  </button>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-      {/* Active Alerts section */}
+      <PriceTable
+        prices={prices}
+        alerts={alerts}
+        handleAlertConditionChange={handleAlertConditionChange}
+        handleAlertValueChange={handleAlertValueChange}
+        handleAlertSubmit={handleAlertSubmit}
+      />
       {alertSet && hasActiveAlerts() && (
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4">Active Alerts</h2>
-          {Object.entries(alerts).map(([symbol, alert], index) => (
-            <div key={index} className="mb-2">
-              <span className="mr-2">{symbol}: </span>
-              {alert.condition === "higher" ? (
-                <span>Price is higher than {alert.value}</span>
-              ) : (
-                <span>Price is lower than {alert.value}</span>
-              )}
-            </div>
-          ))}
-        </div>
+        <ActiveAlerts alerts={alerts} />
       )}
     </div>
   );
 };
 
 export default TopCoinsPriceTracker;
+
+
