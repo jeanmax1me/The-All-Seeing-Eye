@@ -1,5 +1,3 @@
-
-
 // PriceAlertForm component
 interface PriceAlertFormProps {
     symbol: string;
@@ -45,4 +43,4 @@ interface PriceAlertFormProps {
     );
   };
 
-  export default PriceAlertForm;
+  export default PriceAlertForm; 
