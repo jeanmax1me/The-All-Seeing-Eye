@@ -3,6 +3,12 @@ import { useState, useEffect } from "react";
 import PriceTable from "./PriceTable";
 import ActiveAlerts from "./ActiveAlerts";
 import useClient from './useClient';
+import AlertChecker from './AlertChecker'; 
+
+interface CapturedPrices {
+  [symbol: string]: number | undefined; // Key is symbol (string), value is number or undefined
+}
+
 
 const TopCoinsPriceTracker: React.FC = () => {
   const { prices, triggeredAlerts } = useClient();
@@ -10,16 +16,21 @@ const TopCoinsPriceTracker: React.FC = () => {
     Record<string, { condition: string; value: string | null }>
   >({});
   const [alertSet, setAlertSet] = useState<boolean>(false);
+  const [capturedPrices, setCapturedPrices] = useState<CapturedPrices>({});
 
   useEffect(() => {
-    const captureData = () => {
-      const capturedPrices = prices;
+    const captureData = async () => {
+      // ... your logic to fetch or access prices
+      const updatedCapturedPrices = { ...prices }; // Create a copy
+      setCapturedPrices(updatedCapturedPrices); // Update the state
       console.log("Captured prices:", capturedPrices);
     };
-    const intervalId = setInterval(captureData, 5000); // Capture every 5 seconds
+  
+    captureData(); // Call it initially
+  
+    const intervalId = setInterval(captureData, 5000);
     return () => clearInterval(intervalId);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Dependency on prices for re-capture on updates
+  }, []); // Add prices as a dependency
 
 
   const handleAlertConditionChange = (
@@ -108,18 +119,12 @@ const TopCoinsPriceTracker: React.FC = () => {
         handleAlertValueChange={handleAlertValueChange}
         handleAlertSubmit={handleAlertSubmit}
       />
+      <AlertChecker
+        capturedPrices={capturedPrices}
+        alerts={alerts}
+      />
       {alertSet && Object.keys(alerts).length > 0 && (
-        <ActiveAlerts alerts={alerts} prices={prices} />
-      )}
-      {triggeredAlerts.length > 0 && (
-        <div>
-          <h2>Triggered Alerts:</h2>
-          <ul>
-            {triggeredAlerts.map((message, index) => (
-              <li key={index}>{message}</li>
-            ))}
-          </ul>
-        </div>
+        <ActiveAlerts alerts={alerts} prices={capturedPrices} />
       )}
     </div>
   );
