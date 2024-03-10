@@ -1,20 +1,17 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
-import PriceAlertForm from "./PriceAlertsForm";
 import PriceTable from "./PriceTable";
+import ActiveAlerts from "./ActiveAlerts";
 
 const TopCoinsPriceTracker: React.FC = () => {
   const [prices, setPrices] = useState<{ [key: string]: number }>({});
   const [ws, setWs] = useState<WebSocket | null>(null);
-  const [selectedSymbol, setSelectedSymbol] = useState<string>("");
-  const [alertCondition, setAlertCondition] = useState<string>("");
-  const [alertValue, setAlertValue] = useState<number | null>(null);
   const [alerts, setAlerts] = useState<{
     [key: string]: { condition: string; value: string | null };
   }>({});
   const [alertSet, setAlertSet] = useState<boolean>(false); // Track whether an alert has been set
-  const [intervalInitialized, setIntervalInitialized] = useState<boolean>(false);
-
+  const [intervalInitialized, setIntervalInitialized] =
+    useState<boolean>(false);
 
   const checkAlerts = useCallback(() => {
     console.log("Checking alerts...");
@@ -48,8 +45,6 @@ const TopCoinsPriceTracker: React.FC = () => {
     }
   }, [checkAlerts, intervalInitialized]);
 
-
-
   const handleAlertConditionChange = (
     symbol: string,
     event: React.ChangeEvent<HTMLSelectElement>
@@ -79,44 +74,57 @@ const TopCoinsPriceTracker: React.FC = () => {
     }));
   };
 
-  const checkAndTriggerAlert = (symbol: string, condition: string, value: string | null) => {
-    console.log(`Checking alert for ${symbol}: Condition - ${condition}, Value - ${value}`);
-  
-    if (value !== null && (
-      (condition === "higher" && prices[symbol] > parseFloat(value)) ||
-      (condition === "lower" && prices[symbol] < parseFloat(value))
-    )) {
-      console.log(`Alert triggered for ${symbol}: Condition - ${condition}, Value - ${value}`);
+  const checkAndTriggerAlert = (
+    symbol: string,
+    condition: string,
+    value: string | null
+  ) => {
+    console.log(
+      `Checking alert for ${symbol}: Condition - ${condition}, Value - ${value}`
+    );
+
+    if (
+      value !== null &&
+      ((condition === "higher" && prices[symbol] > parseFloat(value)) ||
+        (condition === "lower" && prices[symbol] < parseFloat(value)))
+    ) {
+      console.log(
+        `Alert triggered for ${symbol}: Condition - ${condition}, Value - ${value}`
+      );
       playAlertSound(condition);
     } else {
-      console.log(`Alert not triggered for ${symbol}: Condition - ${condition}, Value - ${value}`);
+      console.log(
+        `Alert not triggered for ${symbol}: Condition - ${condition}, Value - ${value}`
+      );
     }
   };
-  
-  
+
   const playAlertSound = (condition: string) => {
-    const soundToPlay = condition === "higher" ? "alertHigherSound" : "alertLowerSound";
-    const audioElement = document.getElementById(soundToPlay) as HTMLAudioElement;
-  
+    const soundToPlay =
+      condition === "higher" ? "alertHigherSound" : "alertLowerSound";
+    const audioElement = document.getElementById(
+      soundToPlay
+    ) as HTMLAudioElement;
+
     if (audioElement) {
       audioElement.play();
     } else {
       console.warn("Audio element not found.");
     }
   };
-  
+
   function handleAlertSubmit(symbol: string) {
     const { condition, value } = alerts[symbol];
-  
-    console.log(`Alert submitted for ${symbol}: Condition - ${condition}, Value - ${value}`);
-  
+
+    console.log(
+      `Alert submitted for ${symbol}: Condition - ${condition}, Value - ${value}`
+    );
+
     // Set the alert flag to true
     setAlertSet(true);
-  
+
     checkAndTriggerAlert(symbol, condition, value);
   }
-  
-
 
   const hasActiveAlerts = () => {
     return Object.keys(alerts).length > 0;
@@ -156,7 +164,7 @@ const TopCoinsPriceTracker: React.FC = () => {
     newWs.onerror = (error) => {
       console.error("WebSocket error:", error);
       console.log("WebSocket readyState:", newWs.readyState);
-    
+
       if (error instanceof Event) {
         // If the error is an Event object, log its type, target, and any other relevant properties
         console.log("WebSocket error event:", {
@@ -164,21 +172,21 @@ const TopCoinsPriceTracker: React.FC = () => {
           target: error.target,
           timestamp: error.timeStamp,
         });
-    
+
         // Display an error message to the user
-        alert("WebSocket connection error occurred. Please refresh the page to reconnect.");
+        alert(
+          "WebSocket connection error occurred. Please refresh the page to reconnect."
+        );
       } else {
         console.log("WebSocket error:", {
           type: typeof error,
         });
-    
+
         // Display an error message to the user
-        alert("WebSocket connection error occurred. Please refresh the page to reconnect.");
+        alert(
+          "WebSocket connection error occurred. Please refresh the page to reconnect."
+        );
       }
-    };
-    
-    return () => {
-      newWs.close();
     };
   }, []);
 
@@ -197,7 +205,7 @@ const TopCoinsPriceTracker: React.FC = () => {
         handleAlertValueChange={handleAlertValueChange}
         handleAlertSubmit={handleAlertSubmit}
       />
-      {alertSet && hasActiveAlerts() && (
+      {alertSet && Object.keys(alerts).length > 0 && (
         <ActiveAlerts alerts={alerts} />
       )}
     </div>
@@ -205,5 +213,3 @@ const TopCoinsPriceTracker: React.FC = () => {
 };
 
 export default TopCoinsPriceTracker;
-
-
