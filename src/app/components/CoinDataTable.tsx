@@ -20,16 +20,23 @@ const TopCoinsPriceTracker: React.FC = () => {
 
   useEffect(() => {
     const captureData = async () => {
-      // ... your logic to fetch or access prices
-      const updatedCapturedPrices = prices; // Create a copy
-      setCapturedPrices(updatedCapturedPrices); // Update the state
+      const currentTime = Date.now();
+
+      // Throttle updates to every 5 seconds using a flag
+      if (currentTime - lastUpdateTimeRef.current >= 3000) {
+        const updatedPrices = prices; // Replace with your API call
+        setCapturedPrices(updatedPrices);
+        lastUpdateTimeRef.current = currentTime; // Update last update time
+      }
     };
+
     captureData(); // Call it initially
-  
-    const intervalId = setInterval(captureData, 5000);
+
+    const intervalId = setInterval(captureData, 10); // Set a shorter interval for responsiveness
+
     return () => clearInterval(intervalId);
-    // eslint-disable-next-line
-  }, [prices]); // Add prices as a dependency
+  }, [prices]); // Empty dependency array - interval runs on its own
+
 
   useEffect(() => {
     console.log("Captured prices:", capturedPrices);
