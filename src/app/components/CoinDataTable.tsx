@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import PriceTable from "./PriceTable";
 import ActiveAlerts from "./ActiveAlerts";
 import useClient from './useClient';
@@ -9,7 +9,6 @@ interface CapturedPrices {
   [symbol: string]: number | undefined; // Key is symbol (string), value is number or undefined
 }
 
-
 const TopCoinsPriceTracker: React.FC = () => {
   const { prices, triggeredAlerts } = useClient();
   const [alerts, setAlerts] = useState<
@@ -17,21 +16,24 @@ const TopCoinsPriceTracker: React.FC = () => {
   >({});
   const [alertSet, setAlertSet] = useState<boolean>(false);
   const [capturedPrices, setCapturedPrices] = useState<CapturedPrices>({});
+  const lastUpdateTimeRef = useRef(Date.now()); // Track last update time
 
   useEffect(() => {
     const captureData = async () => {
       // ... your logic to fetch or access prices
-      const updatedCapturedPrices = { ...prices }; // Create a copy
+      const updatedCapturedPrices = prices; // Create a copy
       setCapturedPrices(updatedCapturedPrices); // Update the state
-      console.log("Captured prices:", capturedPrices);
     };
-  
     captureData(); // Call it initially
   
     const intervalId = setInterval(captureData, 5000);
     return () => clearInterval(intervalId);
-  }, []); // Add prices as a dependency
+    // eslint-disable-next-line
+  }, [prices]); // Add prices as a dependency
 
+  useEffect(() => {
+    console.log("Captured prices:", capturedPrices);
+  }, [capturedPrices]);
 
   const handleAlertConditionChange = (
     symbol: string,
