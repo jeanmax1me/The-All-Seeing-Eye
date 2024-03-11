@@ -52,24 +52,6 @@ const useClient = () => {
       ws.close();
     };
   }, []);
-
-    
-  
-
-  const checkAlert = (alert: Alert, price: number): boolean => {
-    if (price != null && alert.value != null) {
-      const condition = alert.condition;
-      const value = parseFloat(alert.value);
-
-      return (
-        (condition === "higher" && price > value) ||
-        (condition === "lower" && price < value)
-      );
-    }
-    return false;
-  };
-
-
   
   return { prices, triggeredAlerts };
 };

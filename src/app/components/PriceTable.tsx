@@ -17,6 +17,7 @@ const PriceTable: React.FC<PriceTableProps> = ({
     handleAlertSubmit,
   }) => {
     return (
+      <div className="space-y-2">
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-slate-800">
@@ -45,6 +46,8 @@ const PriceTable: React.FC<PriceTableProps> = ({
             ))}
         </tbody>
       </table>
+      
+      </div>
     );
   };
   

@@ -130,13 +130,10 @@ const TopCoinsPriceTracker: React.FC = () => {
         handleAlertValueChange={handleAlertValueChange}
         handleAlertSubmit={handleAlertSubmit}
       />
-      <AlertChecker
-        capturedPrices={capturedPrices}
-        alerts={alerts}
-      />
       {alertSet && Object.keys(alerts).length > 0 && (
         <ActiveAlerts alerts={alerts} prices={capturedPrices} />
       )}
+       <AlertChecker capturedPrices={capturedPrices} alerts={alerts} />
     </div>
   );
 };

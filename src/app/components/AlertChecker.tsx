@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Alert from "./Alert"; 
 
 interface CapturedPrices {
   [symbol: string]: number | undefined; // Key is symbol (string), value is number or undefined
@@ -16,18 +17,32 @@ const AlertChecker: React.FC<AlertCheckerProps> = ({ capturedPrices, alerts, onA
 
   useEffect(() => {
     const checkAlerts = () => {
-      // ... existing logic to check alerts ...
-      if (onAlertTrigger) {
-        for (const [symbol, isTriggered] of Object.entries(triggeredAlerts)) {
-          onAlertTrigger(symbol, isTriggered);
+      const newTriggeredAlerts: Record<string, boolean> = {};
+      for (const [symbol, alert] of Object.entries(alerts)) {
+        const currentPrice = capturedPrices[symbol];
+        if (currentPrice === undefined) {
+          continue; // Skip if price data unavailable
         }
+
+        const isTriggered = alert.value !== null
+        ? alert.condition === "higher"
+            ? currentPrice > parseFloat(alert.value)
+            : currentPrice < parseFloat(alert.value)
+        : false; // If alert.value is null, consider the alert not triggered
+      
+      newTriggeredAlerts[symbol] = isTriggered;   
       }
+      setTriggeredAlerts(newTriggeredAlerts);
     };
 
     checkAlerts();
   }, [capturedPrices, alerts]); // Update on price/alert changes
 
-  return null; // This component doesn't render any UI
+  return Object.keys(triggeredAlerts).length > 0 ? (
+    Object.entries(triggeredAlerts).map(([symbol, isTriggered]) => (
+      isTriggered && <Alert key={symbol} symbol={symbol} price={capturedPrices[symbol]} />
+    ))
+  ) : null;
 };
 
 export default AlertChecker;
