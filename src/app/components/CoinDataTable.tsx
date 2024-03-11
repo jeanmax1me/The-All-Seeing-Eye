@@ -79,6 +79,8 @@ const TopCoinsPriceTracker: React.FC = () => {
     checkAndTriggerAlert(symbol, condition, value);
   };
 
+
+
   const checkAndTriggerAlert = (
     symbol: string,
     condition: string,

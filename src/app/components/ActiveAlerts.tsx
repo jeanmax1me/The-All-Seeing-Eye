@@ -1,3 +1,5 @@
+import React from "react";
+
 interface CapturedPrices {
   [symbol: string]: number | undefined; // Key is symbol (string), value is number or undefined
 }
@@ -8,52 +10,44 @@ interface ActiveAlertProps {
 }
 
 const ActiveAlerts: React.FC<ActiveAlertProps> = ({ alerts, prices }) => {
-
-    return (
-        <div className="mt-8">
-          <h2>Active Alerts</h2>
-          {Object.entries(alerts).map(([symbol, alert]) => {
-            const currentPrice = prices[symbol]; // Access price from props 
-            if (currentPrice === undefined) return null;
-            const isTriggered = (condition: string, price: number, value: string | null) => {
-              if (value === null) return false; // Handle null values gracefully
-    
-              return (condition === "higher" && currentPrice > parseFloat(value)) ||
-                     (condition === "lower" && currentPrice < parseFloat(value));
-            };
-    
-            const triggered = isTriggered(alert.condition, currentPrice, alert.value);
-    
-            return (
-              <Alert
-                key={symbol}
-                symbol={symbol}
-                condition={alert.condition}
-                value={alert.value}
-                triggered={triggered} // Pass the triggered flag
-              />
-            );
-          })}
-        </div>
-      );
-    };
-
-
-export default ActiveAlerts;
-
-interface AlertProps {
-    symbol: string;
-    condition: string;
-    value: string | null;
-    triggered?: boolean; // Optional triggered prop
-  }
-  
-  const Alert: React.FC<AlertProps> = ({ symbol, condition, value, triggered }) => {
   return (
-    <div className="border rounded p-2 mb-2">
-      <p>
-        {symbol} - {condition} at {value} (if price is {condition === "higher" ? "above" : "below"}).
-      </p>
+    <div className="mt-8">
+      <h2>Active Alerts</h2>
+      <div className="space-y-2">
+        {Object.entries(alerts).map(([symbol, alert]) => {
+          const currentPrice = prices[symbol];
+          if (currentPrice === undefined) return null; // Handle missing prices gracefully
+
+          return (
+            <div
+              key={symbol}
+              className={`p-4 rounded ${
+                alert.condition === "higher"
+                  ? "bg-blue-100 text-blue-700 border-blue-400"
+                  : "bg-red-100 text-red-700 border-red-400"
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span>
+                  {symbol} -{" "}
+                  {alert.condition === "higher"
+                    ? "if price is higher than"
+                    : "if price is below"}{" "}
+                  {alert.value}.
+                </span>
+
+                {alert.condition === "higher" ? (
+                   <span className="text-green-500 font-bold">&#8593;</span> 
+                   ) : (
+                     <span className="text-red-500 font-bold">&#8595;</span> 
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
+
+export default ActiveAlerts;
