@@ -53,12 +53,15 @@ const AlertChecker: React.FC<AlertCheckerProps> = ({
 
   const handleAlertRemoval = (symbol: string) => {
     setTriggeredAlerts((prevTriggeredAlerts) => {
-      const updatedAlerts = { ...prevTriggeredAlerts };
-      delete updatedAlerts[symbol];
+      const updatedAlerts = Object.entries(prevTriggeredAlerts).reduce((acc, [alertSymbol, alertData]) => {
+        if (alertSymbol !== symbol) { // Keep alerts other than the one to be removed
+          acc[alertSymbol] = alertData;
+        }
+        return acc;
+      }, {} as Record<string, { isTriggered: boolean; canRemove?: boolean }>);
       return updatedAlerts;
     });
   };
-
 
 
   return Object.keys(triggeredAlerts).length > 0
