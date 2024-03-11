@@ -1,16 +1,19 @@
-import React from 'react';
-
 interface AlertProps {
   symbol: string;
   price: number | undefined;
 }
 
-const Alert: React.FC<AlertProps> = ({ symbol, price }) => {
-  return (
-    <div className="alert alert-danger">
-      {symbol} alert triggered! (Value: {price || 'N/A'})
-    </div>
-  );
-};
+const Alert: React.FC<AlertProps & { onRemove?: () => void }> = ({
+    symbol,
+    price,
+    onRemove, // Optional prop for removal function
+  }) => {
+    return (
+      <div className="bg-red-500 text-white p-4 rounded-md mt-4 flex justify-between items-center">
+        <span>{symbol} alert triggered! (Value: {price || 'N/A'})</span>
+        {onRemove && <button onClick={onRemove}>Dismiss</button>}
+      </div>
+    );
+  };
 
 export default Alert;

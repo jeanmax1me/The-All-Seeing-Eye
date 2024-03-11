@@ -76,31 +76,8 @@ const TopCoinsPriceTracker: React.FC = () => {
       `Alert submitted for ${symbol}: Condition - ${condition}, Value - ${value}`
     );
     setAlertSet(true);
-    checkAndTriggerAlert(symbol, condition, value);
   };
 
-
-
-  const checkAndTriggerAlert = (
-    symbol: string,
-    condition: string,
-    value: string | null
-  ) => {
-    if (
-      value !== null &&
-      ((condition === "higher" && prices[symbol] > parseFloat(value)) ||
-        (condition === "lower" && prices[symbol] < parseFloat(value)))
-    ) {
-      console.log(
-        `Alert triggered for ${symbol}: Condition - ${condition}, Value - ${value}`
-      );
-      playAlertSound(condition);
-    } else {
-      console.log(
-        `Alert not triggered for ${symbol}: Condition - ${condition}, Value - ${value}`
-      );
-    }
-  };
 
   const playAlertSound = (condition: string) => {
     const soundToPlay =
@@ -133,7 +110,7 @@ const TopCoinsPriceTracker: React.FC = () => {
       {alertSet && Object.keys(alerts).length > 0 && (
         <ActiveAlerts alerts={alerts} prices={capturedPrices} />
       )}
-       <AlertChecker capturedPrices={capturedPrices} alerts={alerts} />
+       <AlertChecker capturedPrices={capturedPrices} alerts={alerts} playAlertSound={playAlertSound} />
     </div>
   );
 };
