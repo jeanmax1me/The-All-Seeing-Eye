@@ -6,7 +6,7 @@ interface AlertProps {
 const Alert: React.FC<AlertProps & { onRemove?: () => void }> = ({
     symbol,
     price,
-    onRemove, // Optional prop for removal function
+    onRemove, 
   }) => {
     return (
       <div className="bg-red-500 text-white p-4 rounded-md mt-4 flex justify-between items-center">

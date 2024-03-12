@@ -6,7 +6,7 @@ import useClient from './useClient';
 import AlertChecker from './AlertChecker'; 
 
 interface CapturedPrices {
-  [symbol: string]: number | undefined; // Key is symbol (string), value is number or undefined
+  [symbol: string]: number | undefined; 
 }
 
 const TopCoinsPriceTracker: React.FC = () => {
@@ -16,26 +16,26 @@ const TopCoinsPriceTracker: React.FC = () => {
   >({});
   const [alertSet, setAlertSet] = useState<boolean>(false);
   const [capturedPrices, setCapturedPrices] = useState<CapturedPrices>({});
-  const lastUpdateTimeRef = useRef(Date.now()); // Track last update time
+  const lastUpdateTimeRef = useRef(Date.now()); 
 
   useEffect(() => {
     const captureData = async () => {
       const currentTime = Date.now();
 
       // Throttle updates to every 5 seconds using a flag
-      if (currentTime - lastUpdateTimeRef.current >= 3000) {
-        const updatedPrices = prices; // Replace with your API call
+      if (currentTime - lastUpdateTimeRef.current >= 4000) {
+        const updatedPrices = prices; 
         setCapturedPrices(updatedPrices);
-        lastUpdateTimeRef.current = currentTime; // Update last update time
+        lastUpdateTimeRef.current = currentTime; 
       }
     };
 
-    captureData(); // Call it initially
+    captureData();
 
-    const intervalId = setInterval(captureData, 10); // Set a shorter interval for responsiveness
+    const intervalId = setInterval(captureData, 10); 
 
     return () => clearInterval(intervalId);
-  }, [prices]); // Empty dependency array - interval runs on its own
+  }, [prices]); 
 
 
   useEffect(() => {
@@ -56,6 +56,8 @@ const TopCoinsPriceTracker: React.FC = () => {
     }));
   };
 
+
+  
   const handleAlertValueChange = (
     symbol: string,
     event: React.ChangeEvent<HTMLInputElement>
@@ -78,6 +80,13 @@ const TopCoinsPriceTracker: React.FC = () => {
     setAlertSet(true);
   };
 
+  const handleAlertDismiss = (symbolToRemove: string) => {
+    setAlerts((prevAlerts) => {
+      const newAlerts = { ...prevAlerts };
+      delete newAlerts[symbolToRemove];
+      return newAlerts;
+    });
+  };
 
   const playAlertSound = (condition: string) => {
     const soundToPlay =
@@ -108,7 +117,7 @@ const TopCoinsPriceTracker: React.FC = () => {
         handleAlertSubmit={handleAlertSubmit}
       />
       {alertSet && Object.keys(alerts).length > 0 && (
-        <ActiveAlerts alerts={alerts} prices={capturedPrices} />
+        <ActiveAlerts alerts={alerts} prices={capturedPrices}  onDismiss={handleAlertDismiss} />
       )}
        <AlertChecker capturedPrices={capturedPrices} alerts={alerts} playAlertSound={playAlertSound} />
     </div>

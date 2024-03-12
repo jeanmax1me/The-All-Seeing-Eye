@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Alert from "./Alert";
 
 interface CapturedPrices {
-  [symbol: string]: number | undefined; // Key is symbol (string), value is number or undefined
+  [symbol: string]: number | undefined; 
 }
 
 interface AlertCheckerProps {
@@ -40,7 +40,7 @@ const AlertChecker: React.FC<AlertCheckerProps> = ({
             : false; // If alert.value is null, consider the alert not triggered
 
         newTriggeredAlerts[symbol] = { isTriggered, canRemove: true }; // Set canRemove to true by default
-        // Play sound if triggered (assuming you want sound for each alert)
+        // Play sound if triggered 
         if (isTriggered) {
           playAlertSound(alert.condition);
         }

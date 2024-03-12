@@ -1,15 +1,26 @@
 import React from "react";
 
 interface CapturedPrices {
-  [symbol: string]: number | undefined; // Key is symbol (string), value is number or undefined
+  [symbol: string]: number | undefined; 
 }
 
 interface ActiveAlertProps {
   alerts: Record<string, { condition: string; value: string | null }>;
   prices: CapturedPrices;
+  onDismiss?: (symbol: string) => void;
 }
 
-const ActiveAlerts: React.FC<ActiveAlertProps> = ({ alerts, prices }) => {
+
+
+const ActiveAlerts: React.FC<ActiveAlertProps> = ({ alerts, prices, onDismiss }) => {
+  const handleDismiss = (symbol: string) => {
+    // Check if onDismiss is a function before calling
+    if (typeof onDismiss === "function") {
+      onDismiss(symbol);
+    } else {
+      console.warn("onDismiss function not provided by parent component.");
+    }
+  };
   return (
     <div className="mt-8">
       <h2>Active Alerts</h2>
@@ -41,6 +52,7 @@ const ActiveAlerts: React.FC<ActiveAlertProps> = ({ alerts, prices }) => {
                    ) : (
                      <span className="text-red-500 font-bold">&#8595;</span> 
                 )}
+                <button onClick={() => handleDismiss(symbol)}>Dismiss</button>
               </div>
             </div>
           );

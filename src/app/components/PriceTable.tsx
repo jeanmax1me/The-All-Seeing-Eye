@@ -8,11 +8,10 @@ interface PriceTableProps {
     handleAlertSubmit: (symbol: string) => void;
   }
   
-// PriceTable component
 const PriceTable: React.FC<PriceTableProps> = ({
     prices,
     alerts,
-    handleAlertConditionChange, // Receive the functions as props
+    handleAlertConditionChange, 
     handleAlertValueChange,
     handleAlertSubmit,
   }) => {
