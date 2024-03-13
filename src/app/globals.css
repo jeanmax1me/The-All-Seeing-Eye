@@ -46,12 +46,13 @@ html {
   line-height: 1.5; 
   color: #eee;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4); 
-  transition: all 0.2 ease;
+  transition: all 0.2 ease-in-out;
   cursor: pointer;
 }
 
 .headertext:hover {
   color: #00ff00;
+  transform: scale(1.08);
 }
 
 audio {
