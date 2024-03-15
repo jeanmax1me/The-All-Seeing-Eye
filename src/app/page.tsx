@@ -13,7 +13,7 @@ export default function Home() {
         </div>
         <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center lg:static lg:h-auto lg:w-auto lg:bg-none rounded-lg p-[8px] border-gray-300 bg-gradient-to-b from-zinc-200 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30 shadow-md">
           <a
-            href="https://twitter.com/jeanmax1me"
+            href="https://twitter.com/relaxedbobo"
             rel="noopener noreferrer"
             target="_blank"
             className="twitter"
