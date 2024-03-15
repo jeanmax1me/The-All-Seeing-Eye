@@ -19,7 +19,7 @@ const useClient = () => {
       const topCoins = [
         "btcusdt",
         "ethusdt",
-        "flokiusdt",
+        "solusdt",
         "wifusdt",
         "avaxusdt",
       ];
