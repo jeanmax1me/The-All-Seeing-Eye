@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -13,6 +14,7 @@ export const metadata: Metadata = {
   description: "Ultrafast data and alerts on cryptos",
 };
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -21,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={poppins.className}>{children}</body>
+      <GoogleAnalytics gaId="G-1MZT8LF965" />
     </html>
   );
 }
