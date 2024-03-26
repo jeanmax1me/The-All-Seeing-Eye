@@ -20,8 +20,8 @@ const useClient = () => {
         "btcusdt",
         "ethusdt",
         "solusdt",
-        "wifusdt",
-        "avaxusdt",
+        "polyxusdt",
+        "rsrusdt",
       ];
       topCoins.forEach((coin) =>
         ws.send(
