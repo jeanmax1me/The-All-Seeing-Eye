@@ -22,7 +22,6 @@ const TopCoinsPriceTracker: React.FC = () => {
     const captureData = async () => {
       const currentTime = Date.now();
 
-      // Throttle updates to every 5 seconds using a flag
       if (currentTime - lastUpdateTimeRef.current >= 4000) {
         const updatedPrices = prices; 
         setCapturedPrices(updatedPrices);
@@ -88,18 +87,34 @@ const TopCoinsPriceTracker: React.FC = () => {
     });
   };
 
+  let hasPlayedHigherSound = false;
+  let hasPlayedLowerSound = false;
+  
   const playAlertSound = (condition: string) => {
-    const soundToPlay =
-      condition === "higher" ? "alertHigherSound" : "alertLowerSound";
-    const audioElement = document.getElementById(
-      soundToPlay
-    ) as HTMLAudioElement;
-    if (audioElement) {
-      audioElement.play();
-    } else {
-      console.warn("Audio element not found.");
+    if ((condition === "higher" && !hasPlayedHigherSound) ||
+        (condition === "lower" && !hasPlayedLowerSound)) {
+      const soundToPlay = condition === "higher" ? "alertHigherSound" : "alertLowerSound";
+      const audioElement = document.getElementById(soundToPlay) as HTMLAudioElement;
+      if (audioElement) {
+        audioElement.play();
+        // Set hasPlayed flag only after playing the sound
+        if (condition === "higher") {
+          hasPlayedHigherSound = true;
+          setTimeout(() => {
+            hasPlayedHigherSound = false;
+          }, 30000);
+        } else {
+          hasPlayedLowerSound = true;
+          setTimeout(() => {
+            hasPlayedLowerSound = false;
+          }, 30000);
+        }
+      } else {
+        console.warn("Audio element not found.");
+      }
     }
   };
+  
 
   return (
     <div className="max-w-screen-md mx-auto">

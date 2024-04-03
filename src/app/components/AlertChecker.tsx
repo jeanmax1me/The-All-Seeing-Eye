@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Alert from "./Alert";
 
 interface CapturedPrices {
-  [symbol: string]: number | undefined; 
+  [symbol: string]: number | undefined;
 }
 
 interface AlertCheckerProps {
@@ -17,8 +17,10 @@ const AlertChecker: React.FC<AlertCheckerProps> = ({
   alerts,
   playAlertSound,
 }) => {
-  const [triggeredAlerts, setTriggeredAlerts] = useState<Record<string, { isTriggered: boolean; canRemove?: boolean | undefined }>>({});
-
+  const [triggeredAlerts, setTriggeredAlerts] = useState<
+    Record<string, { isTriggered: boolean; canRemove?: boolean | undefined;
+     }>
+  >({});
 
   useEffect(() => {
     const checkAlerts = () => {
@@ -40,7 +42,7 @@ const AlertChecker: React.FC<AlertCheckerProps> = ({
             : false; // If alert.value is null, consider the alert not triggered
 
         newTriggeredAlerts[symbol] = { isTriggered, canRemove: true }; // Set canRemove to true by default
-        // Play sound if triggered 
+        // Play sound if triggered
         if (isTriggered) {
           playAlertSound(alert.condition);
         }
@@ -53,16 +55,19 @@ const AlertChecker: React.FC<AlertCheckerProps> = ({
 
   const handleAlertRemoval = (symbol: string) => {
     setTriggeredAlerts((prevTriggeredAlerts) => {
-      const updatedAlerts = Object.entries(prevTriggeredAlerts).reduce((acc, [alertSymbol, alertData]) => {
-        if (alertSymbol !== symbol) { // Keep alerts other than the one to be removed
-          acc[alertSymbol] = alertData;
-        }
-        return acc;
-      }, {} as Record<string, { isTriggered: boolean; canRemove?: boolean }>);
+      const updatedAlerts = Object.entries(prevTriggeredAlerts).reduce(
+        (acc, [alertSymbol, alertData]) => {
+          if (alertSymbol !== symbol) {
+            // Keep alerts other than the one to be removed
+            acc[alertSymbol] = alertData;
+          }
+          return acc;
+        },
+        {} as Record<string, { isTriggered: boolean; canRemove?: boolean }>
+      );
       return updatedAlerts;
     });
   };
-
 
   return Object.keys(triggeredAlerts).length > 0
     ? Object.entries(triggeredAlerts).map(
@@ -72,7 +77,9 @@ const AlertChecker: React.FC<AlertCheckerProps> = ({
               key={symbol}
               symbol={symbol}
               price={capturedPrices[symbol]}
-              onRemove={canRemove ? handleAlertRemoval.bind(null, symbol) : undefined}// Pass removal function with symbol
+              onRemove={
+                canRemove ? handleAlertRemoval.bind(null, symbol) : undefined
+              } // Pass removal function with symbol
             />
           )
       )
